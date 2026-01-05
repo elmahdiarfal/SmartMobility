@@ -1,0 +1,6 @@
+sumolib
+traci
+pandas
+kafka-python
+matplotlib
+psycopg2-binary  # Optional, for PostgreSQL
