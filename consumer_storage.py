@@ -146,4 +146,4 @@ def run_consumer(storage_type='sqlite'):
 
 if __name__ == "__main__":
     # Choose storage type: 'sqlite' or 'postgres'
-    run_consumer(storage_type='sqlite')
+    run_consumer(storage_type='postgres')

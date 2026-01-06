@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # Zookeeper (required by Kafka)
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.0
     environment:
@@ -9,6 +10,7 @@ services:
     ports:
       - "2181:2181"
 
+  # Kafka
   kafka:
     image: confluentinc/cp-kafka:7.4.0
     depends_on:
@@ -19,15 +21,13 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      
-      # Simplified listener configuration
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
+  # Kafka Web UI
   kafdrop:
     image: obsidiandynamics/kafdrop:latest
     depends_on:
@@ -37,3 +37,50 @@ services:
     environment:
       KAFKA_BROKERCONNECT: kafka:9092
       JVM_OPTS: "-Xms32M -Xmx128M"
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: sumodb
+      POSTGRES_USER: sumouser
+      POSTGRES_PASSWORD: sumopass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sumouser -d sumodb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL Web UI
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@sumo.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+
+  # Grafana Dashboard
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_INSTALL_PLUGINS: grafana-piechart-panel
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /etc/grafana/provisioning/dashboards/sumo-dashboard.json
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+  grafana_data:

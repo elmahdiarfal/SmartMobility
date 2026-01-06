@@ -1,0 +1,202 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": "sumo-traffic-realtime",
+    "title": "SUMO Traffic - Real Time",
+    "tags": [
+      "sumo",
+      "traffic",
+      "kafka"
+    ],
+    "timezone": "browser",
+    "schemaVersion": 35,
+    "version": 0,
+    "refresh": "5s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Vehicle Speed Over Time",
+        "type": "timeseries",
+        "gridPos": {
+          "h": 10,
+          "w": 24,
+          "x": 0,
+          "y": 0
+        },
+        "datasource": "PostgreSQL",
+        "targets": [
+          {
+            "rawSql": "SELECT simulation_time as \"time\", AVG(speed) as \"avg_speed\" FROM vehicle_telemetry WHERE $__timeFilter(simulation_time) GROUP BY simulation_time ORDER BY simulation_time",
+            "format": "time_series",
+            "refId": "A"
+          },
+          {
+            "rawSql": "SELECT simulation_time as \"time\", MAX(speed) as \"max_speed\" FROM vehicle_telemetry WHERE $__timeFilter(simulation_time) GROUP BY simulation_time ORDER BY simulation_time",
+            "format": "time_series",
+            "refId": "B"
+          },
+          {
+            "rawSql": "SELECT simulation_time as \"time\", MIN(speed) as \"min_speed\" FROM vehicle_telemetry WHERE $__timeFilter(simulation_time) GROUP BY simulation_time ORDER BY simulation_time",
+            "format": "time_series",
+            "refId": "C"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "m/s",
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "lineWidth": 2,
+              "fillOpacity": 10,
+              "drawStyle": "line",
+              "showPoints": "auto"
+            }
+          },
+          "overrides": []
+        },
+        "options": {
+          "tooltip": {
+            "mode": "single"
+          },
+          "legend": {
+            "showLegend": true,
+            "displayMode": "list",
+            "placement": "bottom"
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "Number of Vehicles Over Time",
+        "type": "timeseries",
+        "gridPos": {
+          "h": 10,
+          "w": 24,
+          "x": 0,
+          "y": 10
+        },
+        "datasource": "PostgreSQL",
+        "targets": [
+          {
+            "rawSql": "SELECT simulation_time as \"time\", COUNT(DISTINCT vehicle_id) as \"vehicle_count\" FROM vehicle_telemetry WHERE $__timeFilter(simulation_time) GROUP BY simulation_time ORDER BY simulation_time",
+            "format": "time_series",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "lineWidth": 2,
+              "fillOpacity": 10,
+              "drawStyle": "line",
+              "showPoints": "auto"
+            }
+          }
+        }
+      },
+      {
+        "id": 3,
+        "title": "Speed by Vehicle",
+        "type": "timeseries",
+        "gridPos": {
+          "h": 10,
+          "w": 24,
+          "x": 0,
+          "y": 20
+        },
+        "datasource": "PostgreSQL",
+        "targets": [
+          {
+            "rawSql": "SELECT simulation_time as \"time\", vehicle_id as \"metric\", speed as \"value\" FROM vehicle_telemetry WHERE $__timeFilter(simulation_time) AND vehicle_id IN (SELECT vehicle_id FROM vehicle_telemetry GROUP BY vehicle_id ORDER BY COUNT(*) DESC LIMIT 5) ORDER BY simulation_time, vehicle_id",
+            "format": "time_series",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "m/s",
+            "color": {
+              "mode": "palette-classic"
+            }
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "Current Statistics",
+        "type": "stat",
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 0,
+          "y": 30
+        },
+        "datasource": "PostgreSQL",
+        "targets": [
+          {
+            "rawSql": "SELECT AVG(speed) as value FROM vehicle_telemetry WHERE simulation_time > EXTRACT(EPOCH FROM NOW() - INTERVAL '5 minutes')",
+            "format": "table",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "m/s",
+            "decimals": 2,
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "red",
+                  "value": null
+                },
+                {
+                  "color": "yellow",
+                  "value": 5
+                },
+                {
+                  "color": "green",
+                  "value": 10
+                }
+              ]
+            }
+          }
+        },
+        "options": {
+          "reduceOptions": {
+            "values": false,
+            "calcs": [
+              "lastNotNull"
+            ]
+          },
+          "orientation": "auto",
+          "textMode": "auto"
+        }
+      }
+    ],
+    "time": {
+      "from": "now-5m",
+      "to": "now"
+    },
+    "timepicker": {
+      "refresh_intervals": [
+        "5s",
+        "10s",
+        "30s",
+        "1m",
+        "5m"
+      ]
+    }
+  },
+  "overwrite": true,
+  "message": "SUMO Real-time Traffic Dashboard"
+}
