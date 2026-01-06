@@ -1,23 +1,60 @@
-# Smart Mobility 🚗💨
+# SUMO Real-time Traffic Monitoring System 🚦
 
-A real-time traffic simulation and big data pipeline system for urban mobility analysis using **SUMO**, **Apache Kafka**, and database/storage technologies.
-
----
-
-## 📋 Project Overview
-
-This project simulates urban traffic using **SUMO** (Simulation of Urban MObility), streams telemetry data through **Apache Kafka**, stores it in **SQLite** / **PostgreSQL** databases, and provides visualization and analysis tools. It's designed as a complete data pipeline for smart mobility research and data engineering demonstrations.
+A comprehensive traffic simulation and monitoring system that integrates **SUMO (Simulation of Urban MObility)** with modern data streaming and visualization tools. This project simulates vehicle traffic, collects telemetry data in real-time, streams it through **Kafka**, stores it in **PostgreSQL**, and visualizes it in **Grafana** dashboards.
 
 ---
 
-## 🏗️ Architecture
+## 📋 Table of Contents
+
+* Requirements
+* Project Structure
+* Quick Start
+* Architecture & Workflow
+* Services Overview
+* SUMO Configuration
+* Docker Setup
+* Kafka & Zookeeper
+* Database Setup
+* Grafana Dashboards
+* File Descriptions
+* Usage Instructions
+* Troubleshooting
+* Extensions & Customizations
+
+---
+
+## 🎯 Requirements
+
+### System Requirements
+
+* **OS:** Windows 10/11 (64-bit) or Linux/macOS
+* **RAM:** Minimum 8GB (16GB recommended)
+* **Storage:** 5GB free space
+* **Processor:** x64 architecture
+
+### Software Dependencies
+
+| Software       | Version | Purpose                       |
+| -------------- | ------- | ----------------------------- |
+| Docker Desktop | 20.10+  | Container runtime             |
+| Docker Compose | 2.0+    | Multi-container orchestration |
+| Python         | 3.8+    | Data collection & processing  |
+| Git            | 2.30+   | Version control               |
+| SUMO           | 1.15.0+ | Traffic simulation            |
+
+### Python Packages
+
+All Python dependencies are listed in `requirements.txt`:
 
 ```
-┌─────────────────┐   ┌─────────────┐   ┌─────────────────┐   ┌──────────────┐
-│ SUMO Traffic    │──▶│ Apache      │──▶│ Database        │──▶│ Data         │
-│ Simulation      │   │ Kafka       │   │ Storage         │   │ Analysis &   │
-│ (collector.py)  │   │             │   │ (SQLite/Postgres)│  │ Viz Tools    │
-└─────────────────┘   └─────────────┘   └─────────────────┘   └──────────────┘
+sumolib
+traci
+pandas
+kafka-python
+matplotlib
+sqlite3
+psycopg2-binary
+requests
 ```
 
 ---
@@ -25,284 +62,264 @@ This project simulates urban traffic using **SUMO** (Simulation of Urban MObilit
 ## 📁 Project Structure
 
 ```
-smart-mobility/
-├── network.net.xml           # SUMO network definition (roads, junctions)
-├── network.rou.xml           # Vehicle routes and types
-├── network.settings.xml      # SUMO visualization settings
-├── network.sumocfg           # SUMO configuration file
-├── collector.py              # SUMO simulator & Kafka producer
-├── consumer_storage.py       # Kafka consumer & database storage
-├── analyze_stored_data.py    # Data analysis & visualization
-├── requirements.txt          # Python dependencies
-├── docker-compose.yml        # Kafka & Zookeeper services
-├── docker-compose-db.yml     # PostgreSQL & PgAdmin services
-└── README.md
+SMARTMOBILITY1/
+├── .venv/                          # Python virtual environment
+├── grafana/
+│   └── provisioning/
+│       ├── dashboards/
+│       │   ├── dashboard.yml       # Grafana dashboard provisioning
+│       │   └── sumo-dashboard.json # Main dashboard definition
+│       └── datasources/
+│           └── datasources.yml     # PostgreSQL datasource config
+├── docker-compose.yml              # Main Docker configuration
+├── collector.py                    # SUMO data collector (Kafka producer)
+├── consumer_storage.py             # Kafka consumer & database storage
+├── network.net.xml                 # SUMO network definition
+├── network.rou.xml                 # SUMO vehicle routes
+├── network.settings.xml            # SUMO visualization settings
+├── requirements.txt                # Python dependencies
+├── start-system.bat                # Windows startup script
+└── README.md                       # This file
 ```
 
 ---
 
 ## 🚀 Quick Start
 
-### Prerequisites
-
-* Python 3.8+
-* SUMO installed (Windows example: `C:/Program Files (x86)/Eclipse/Sumo/`)
-* Docker & Docker Compose
-* Git
-
-### Installation
-
-1. **Clone the repository**
+### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/smart-mobility.git
-cd smart-mobility
+git clone https://github.com/yourusername/sumo-traffic-monitoring.git
+cd sumo-traffic-monitoring
 ```
 
-2. **Install Python dependencies**
+### 2. Install Prerequisites
+
+#### Windows Installation
+
+* Install **Docker Desktop**
+
+  * Download from Docker Desktop for Windows
+  * Enable WSL 2 backend during installation
+  * Start Docker Desktop after installation
+
+* Install **Python 3.8+**
+
+  * Download from python.org
+  * Check **Add Python to PATH** during installation
+  * Verify: `python --version`
+
+* Install **SUMO**
+
+  * Download from SUMO Download
+  * Install to default location: `C:/Program Files (x86)/Eclipse/Sumo/`
+  * Add SUMO to PATH environment variable
+
+#### Linux/macOS Installation
 
 ```bash
+# Install Docker & Docker Compose
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+sudo apt-get install docker-compose
+
+# Install Python dependencies
+sudo apt-get install python3 python3-pip python3-venv
+
+# Install SUMO (Ubuntu/Debian)
+sudo add-apt-repository ppa:sumo/stable
+sudo apt-get update
+sudo apt-get install sumo sumo-tools sumo-doc
+```
+
+### 3. Set Up Python Environment
+
+```bash
+python -m venv .venv
+
+# Windows
+.venv\Scripts\activate
+
+# Linux/macOS
+source .venv/bin/activate
+
 pip install -r requirements.txt
 ```
 
-3. **Start Kafka services**
+### 4. Start the System
 
 ```bash
+# Windows
+start-system.bat
+
+# Linux/macOS
 docker-compose up -d
 ```
 
-Verify Kafka web UI (Kafdrop) at `http://localhost:9000` (if configured).
+### 5. Run the Simulation
 
----
+Open two terminals:
 
-## 🎯 Usage Guide
-
-**Step 1: Start the Simulation Pipeline**
-
-* Terminal 1 — Start the data consumer:
+**Terminal 1 – Data Consumer**
 
 ```bash
 python consumer_storage.py
 ```
 
-* Terminal 2 — Start the SUMO simulation (collector):
+**Terminal 2 – SUMO Collector**
 
 ```bash
 python collector.py
 ```
 
-**Step 2: Analyze the Data**
+---
 
-Once simulation data is collected, run the analysis:
+## 🏗 Architecture & Workflow
 
-```bash
-python analyze_stored_data.py
+```
+┌─────────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│   SUMO Traffic  │    │   Kafka     │    │ PostgreSQL  │    │   Grafana   │
+│   Simulation    │────▶   Broker    │────▶  Database   │────▶  Dashboard  │
+│   (collector.py)│    │             │    │             │    │             │
+└─────────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
 ```
 
-This will:
+**Data Flow**
 
-* Display statistical summaries
-* Generate trajectory plots
-* Create speed-over-time visualizations
-* Export data to CSV format
-
-**Step 3: Database Management**
-
-Using SQLite (default):
-
-* Data automatically stored in `sumo_data.db`
-* Access with: `sqlite3 sumo_data.db`
-
-Using PostgreSQL:
-
-```bash
-docker-compose -f docker-compose-db.yml up -d
-```
-
-* Access PgAdmin at `http://localhost:5050`
-* Email: `admin@sumo.com`
-* Password: `admin`
-
-Update `consumer_storage.py` to use `storage_type='postgres'`.
+* SUMO Simulation → Generates vehicle telemetry (position, speed, lane)
+* Kafka Producer (`collector.py`) → Streams data to topic `vehTelemetry`
+* Kafka Consumer (`consumer_storage.py`) → Stores data in PostgreSQL
+* Grafana → Queries PostgreSQL and displays real-time dashboards
 
 ---
 
-## 🔧 Configuration
+## 🔧 Services Overview
 
-**Kafka Configuration**
-
-* Bootstrap Server: `localhost:29092`
-* Topic: `vehTelemetry`
-* Kafdrop UI: `http://localhost:9000`
-
-**SUMO Configuration**
-
-* Binary Path (example): `C:/Program Files (x86)/Eclipse/Sumo/bin/sumo-gui`
-* Max Simulation Steps: `1000`
-* Update Interval: `0.05` seconds
-
-**Vehicle Types Defined**
-
-* `normal`: Standard vehicle (50 km/h max)
-* `slow`: Slower vehicle (45 km/h max)
-* `fast`: Faster vehicle (55 km/h max)
+| Service            | Port  | URL                                            | Credentials                                     |
+| ------------------ | ----- | ---------------------------------------------- | ----------------------------------------------- |
+| Grafana            | 3000  | [http://localhost:3000](http://localhost:3000) | admin / admin                                   |
+| Kafka UI (Kafdrop) | 9000  | [http://localhost:9000](http://localhost:9000) | –                                               |
+| pgAdmin            | 5050  | [http://localhost:5050](http://localhost:5050) | [admin@sumo.com](mailto:admin@sumo.com) / admin |
+| PostgreSQL         | 5432  | localhost:5432                                 | sumouser / sumopass                             |
+| Kafka Broker       | 9092  | localhost:9092                                 | –                                               |
+| Kafka (External)   | 29092 | localhost:29092                                | –                                               |
+| Zookeeper          | 2181  | localhost:2181                                 | –                                               |
 
 ---
 
-## 📊 Data Schema
+## 🚦 SUMO Configuration
+
+### Network Definition (`network.net.xml`)
+
+* 6-junction traffic network
+* Junction types: priority, right_before_left, internal
+* 24 edges with specific lanes and connections
+* Coordinate system for vehicle positioning
+
+### Vehicle Routes (`network.rou.xml`)
+
+* Vehicle types: `normal`, `slow`, `fast`
+* Initial vehicles: `veh0`, `veh1`, `veh2`
+* Random flow vehicles (20% probability)
+
+### Simulation Settings (`network.settings.xml`)
+
+* Viewport centered at (50, 75)
+* 100% zoom
+* 200ms delay between steps
+
+---
+
+## 🐳 Docker Setup
+
+Services include **Zookeeper**, **Kafka**, **Kafdrop**, **PostgreSQL**, **pgAdmin**, and **Grafana**.
+
+### Volumes
+
+```yaml
+volumes:
+  postgres_data:
+  grafana_data:
+```
+
+---
+
+## 📊 Kafka & Zookeeper
+
+* **Topic:** `vehTelemetry`
+* **Format:** JSON vehicle telemetry
+* **Partitions:** 1
+* **Replication:** 1
+
+Producer and consumer configurations are defined in `collector.py` and `consumer_storage.py`.
+
+---
+
+## 🗄 Database Setup
 
 ```sql
 CREATE TABLE vehicle_telemetry (
-    id INTEGER PRIMARY KEY,
-    timestamp DATETIME,
-    simulation_time REAL,
-    vehicle_id TEXT,
-    x REAL,
-    y REAL,
-    speed REAL,
-    lane TEXT,
-    edge TEXT,
-    created_at DATETIME
+    id SERIAL PRIMARY KEY,
+    timestamp TIMESTAMP DEFAULT NOW(),
+    simulation_time DOUBLE PRECISION,
+    vehicle_id VARCHAR(50),
+    x DOUBLE PRECISION,
+    y DOUBLE PRECISION,
+    speed DOUBLE PRECISION,
+    lane VARCHAR(100),
+    edge VARCHAR(100),
+    created_at TIMESTAMP DEFAULT NOW()
 );
 ```
 
 ---
 
-## 📈 Sample Analysis Output
+## 📈 Grafana Dashboards
 
-The analysis script provides:
+* Vehicle speed over time
+* Vehicle count over time
+* Per-vehicle speed tracking
+* Real-time statistics with thresholds
 
-* **Basic Statistics:** Record counts, unique vehicles, speed metrics
-* **Vehicle Trajectories:** Movement paths visualization
-* **Speed Analysis:** Per-edge speed patterns
-* **Time Series:** Speed changes over simulation time
-* **Vehicle Classification:** Performance by vehicle type
-
----
-
-## 🐳 Docker Services
-
-**Kafka Cluster**
-
-```bash
-# Start all services
-docker-compose up -d
-
-# Check status
-docker-compose ps
-
-# View logs
-docker-compose logs -f kafka
-
-# Stop services
-docker-compose down
-```
-
-**Database Stack**
-
-```bash
-# Start PostgreSQL & PgAdmin
-docker-compose -f docker-compose-db.yml up -d
-
-# Access PgAdmin: http://localhost:5050
-```
+Dashboards are auto-provisioned from `grafana/provisioning/`.
 
 ---
 
-## 🧪 Testing the Pipeline
+## 🛠 Usage Instructions
 
-* Verify Kafka is receiving messages: check Kafdrop at `http://localhost:9000`
-* Monitor consumer output for message counts
-* Verify data storage:
-
-  * SQLite: check `sumo_data.db` file size
-  * PostgreSQL: query the `vehicle_telemetry` table
-* Run validation analysis:
-
-```bash
-python analyze_stored_data.py
-```
+* Start Docker services
+* Start consumer and collector scripts
+* Access Grafana at [http://localhost:3000](http://localhost:3000)
+* Monitor Kafka at [http://localhost:9000](http://localhost:9000)
+* Manage DB at [http://localhost:5050](http://localhost:5050)
 
 ---
 
 ## 🔍 Troubleshooting
 
-**Common Issues**
+Common issues include Docker not running, port conflicts, SUMO path issues, Kafka initialization delays, and database startup delays. Check logs using:
 
-* **SUMO not found:**
-
-  * Update `SUMO_TOOLS` path in `collector.py`
-  * Ensure SUMO is installed correctly
-
-* **Kafka connection errors:**
-
-  * Check Docker containers are running: `docker-compose ps`
-  * Verify port `29092` is available
-  * Restart services: `docker-compose restart`
-
-* **Database connection issues:**
-
-  * SQLite: check file permissions
-  * PostgreSQL: ensure Docker container is running
-
-* **No data in analysis:**
-
-  * Run simulation first (`collector.py`)
-  * Ensure consumer is running (`consumer_storage.py`)
-  * Check Kafka topic has messages
+```bash
+docker-compose logs
+```
 
 ---
 
-## 📚 Documentation
+## 🚀 Extensions & Customizations
 
-**Key Components**
-
-* `collector.py` — SUMO simulation controller; Kafka producer for vehicle telemetry; real-time data streaming
-* `consumer_storage.py` — Kafka consumer with configurable storage; supports SQLite and PostgreSQL; data validation and error handling
-* `analyze_stored_data.py` — Statistical analysis and visualization; export capabilities; interactive data exploration
-
-**Data Flow**
-
-1. SUMO generates vehicle positions/speeds
-2. Collector publishes to Kafka topic
-3. Consumer stores in database
-4. Analyzer processes and visualizes
+* Add vehicle types
+* Extend SUMO networks
+* Collect additional metrics (CO₂, fuel, noise)
+* Create new Grafana dashboards
+* Scale Kafka cluster
+* Add advanced analytics consumers
 
 ---
 
-## 🤝 Contributing
+## 📚 Learning Resources
 
-* Fork the repository
-* Create a feature branch
-* Commit your changes
-* Push to the branch
-* Open a Pull Request
-
----
-
-## 📄 License
-
-This project is licensed under the **MIT License** — see the `LICENSE` file for details.
-
----
-
-## 🙏 Acknowledgments
-
-* SUMO - Simulation of Urban MObility
-* Apache Kafka - Distributed streaming platform
-* Docker - Containerization platform
-* Pandas - Data analysis library
-* Matplotlib - Visualization library
-
----
-
-## 📞 Support
-
-For issues and questions:
-
-* Check the Troubleshooting section
-* Open a GitHub Issue and provide simulation logs and error messages
-
----
-
-*Generated file: `SMART-MOBILITY.md`*
+* SUMO Documentation
+* TraCI Python API
+* Apache Kafka Documentation
+* Grafana Documentation
+* Docker & Docker Compose Reference
