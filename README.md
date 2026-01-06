@@ -62,7 +62,7 @@ requests
 ## 📁 Project Structure
 
 ```
-SMARTMOBILITY1/
+SMARTMOBILITY/
 ├── .venv/                          # Python virtual environment
 ├── grafana/
 │   └── provisioning/
@@ -89,8 +89,7 @@ SMARTMOBILITY1/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/sumo-traffic-monitoring.git
-cd sumo-traffic-monitoring
+git clone https://github.com/elmahdiarfal/SmartMobility.git
 ```
 
 ### 2. Install Prerequisites
@@ -99,38 +98,9 @@ cd sumo-traffic-monitoring
 
 * Install **Docker Desktop**
 
-  * Download from Docker Desktop for Windows
-  * Enable WSL 2 backend during installation
-  * Start Docker Desktop after installation
-
 * Install **Python 3.8+**
 
-  * Download from python.org
-  * Check **Add Python to PATH** during installation
-  * Verify: `python --version`
-
 * Install **SUMO**
-
-  * Download from SUMO Download
-  * Install to default location: `C:/Program Files (x86)/Eclipse/Sumo/`
-  * Add SUMO to PATH environment variable
-
-#### Linux/macOS Installation
-
-```bash
-# Install Docker & Docker Compose
-curl -fsSL https://get.docker.com -o get-docker.sh
-sudo sh get-docker.sh
-sudo apt-get install docker-compose
-
-# Install Python dependencies
-sudo apt-get install python3 python3-pip python3-venv
-
-# Install SUMO (Ubuntu/Debian)
-sudo add-apt-repository ppa:sumo/stable
-sudo apt-get update
-sudo apt-get install sumo sumo-tools sumo-doc
-```
 
 ### 3. Set Up Python Environment
 
@@ -140,9 +110,6 @@ python -m venv .venv
 # Windows
 .venv\Scripts\activate
 
-# Linux/macOS
-source .venv/bin/activate
-
 pip install -r requirements.txt
 ```
 
@@ -151,9 +118,6 @@ pip install -r requirements.txt
 ```bash
 # Windows
 start-system.bat
-
-# Linux/macOS
-docker-compose up -d
 ```
 
 ### 5. Run the Simulation
@@ -199,7 +163,7 @@ python collector.py
 | ------------------ | ----- | ---------------------------------------------- | ----------------------------------------------- |
 | Grafana            | 3000  | [http://localhost:3000](http://localhost:3000) | admin / admin                                   |
 | Kafka UI (Kafdrop) | 9000  | [http://localhost:9000](http://localhost:9000) | –                                               |
-| pgAdmin            | 5050  | [http://localhost:5050](http://localhost:5050) | [admin@sumo.com](mailto:admin@sumo.com) / admin |
+| pgAdmin            | 5050  | [http://localhost:5050](http://localhost:5050) | admin@sumo.com / admin |
 | PostgreSQL         | 5432  | localhost:5432                                 | sumouser / sumopass                             |
 | Kafka Broker       | 9092  | localhost:9092                                 | –                                               |
 | Kafka (External)   | 29092 | localhost:29092                                | –                                               |
