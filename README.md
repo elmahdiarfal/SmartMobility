@@ -1,4 +1,4 @@
-# SUMO Real-time Traffic Monitoring System 🚦
+# Smart Mobility 🚦
 
 A comprehensive traffic simulation and monitoring system that integrates **SUMO (Simulation of Urban MObility)** with modern data streaming and visualization tools. This project simulates vehicle traffic, collects telemetry data in real-time, streams it through **Kafka**, stores it in **PostgreSQL**, and visualizes it in **Grafana** dashboards.
 
