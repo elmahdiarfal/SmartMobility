@@ -1,5 +1,9 @@
 # Smart Mobility 🚦
 
+**Author**: El Mahdi ARFAL  
+**Academic Year**: 2025/2026  
+**Institution**: National Institute of Posts and Telecommunications (INPT)
+
 A comprehensive traffic simulation and monitoring system that integrates **SUMO (Simulation of Urban MObility)** with modern data streaming and visualization tools. This project simulates vehicle traffic, collects telemetry data in real-time, streams it through **Kafka**, stores it in **PostgreSQL**, and visualizes it in **Grafana** dashboards.
 
 ---
