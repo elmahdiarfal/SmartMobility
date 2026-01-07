@@ -1,6 +1,6 @@
 @echo off
 echo ==========================================
-echo SUMO Real-time Traffic Monitoring System
+echo SMART MOBILITY
 echo ==========================================
 echo.
 
