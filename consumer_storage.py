@@ -11,13 +11,13 @@ class DataStorage:
     
     def setup_database(self):
         if self.storage_type == 'sqlite':
-            # SQLite (Simplest option - no external dependencies)
+            # SQLite
             self.conn = sqlite3.connect('sumo_data.db')
             self.cursor = self.conn.cursor()
             self.create_table_sqlite()
         
         elif self.storage_type == 'postgres':
-            # PostgreSQL (More scalable)
+            # PostgreSQL
             self.conn = psycopg2.connect(
                 host='localhost',
                 database='sumodb',
