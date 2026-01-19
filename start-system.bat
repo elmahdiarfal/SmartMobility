@@ -17,17 +17,17 @@ if errorlevel 1 (
     exit /b 1
 )
 
-echo ✓ Docker and Docker Compose are installed
+echo Docker and Docker Compose are installed
 echo.
 
 echo Stopping existing containers...
 docker-compose down
-echo ✓ Existing containers stopped
+echo Existing containers stopped
 echo.
 
 echo Starting Docker containers...
 docker-compose up -d
-echo ✓ Docker containers started
+echo Docker containers started
 echo.
 
 echo Waiting for services to initialize...
@@ -38,27 +38,22 @@ echo ==========================================
 echo          SERVICES ARE RUNNING
 echo ==========================================
 echo.
-echo 📊 MONITORING DASHBOARDS
-echo    • Grafana Dashboard:     http://localhost:3000
+echo MONITORING DASHBOARDS
+echo    Grafana Dashboard:     http://localhost:3000
 echo      - Username: admin
 echo      - Password: admin
 echo.
-echo    • Kafka Web UI (Kafdrop): http://localhost:9000
+echo    Kafka Web UI (Kafdrop): http://localhost:9000
 echo.
-echo    • PostgreSQL Web UI (pgAdmin): http://localhost:5050
+echo    PostgreSQL Web UI (pgAdmin): http://localhost:5050
 echo      - Email: admin@sumo.com
 echo      - Password: admin
 echo.
-echo 🔧 BACKEND SERVICES
-echo    • PostgreSQL Database:   localhost:5432
-echo    • Kafka Broker:          localhost:9092
-echo    • Kafka (external):      localhost:29092
-echo    • Zookeeper:             localhost:2181
 echo.
-echo 📝 DATABASE CREDENTIALS
-echo    • Database: sumodb
-echo    • Username: sumouser
-echo    • Password: sumopass
+echo DATABASE CREDENTIALS
+echo    Database: sumodb
+echo    Username: sumouser
+echo    Password: sumopass
 echo.
 echo ==========================================
 echo.
@@ -82,6 +77,6 @@ echo    Then run: docker-compose down
 echo.
 echo ==========================================
 echo.
-echo ✓ System startup complete! Follow the next steps above.
+echo System startup complete! Follow the next steps above.
 echo.
 pause
